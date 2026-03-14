@@ -8,25 +8,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
-        .card-cliente { border: none; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: 0.2s; }
-        .btn-float { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; }
-        .empty-state { text-align: center; margin-top: 50px; color: #6c757d; }
-        .card-clicavel { cursor: pointer; }
-        .card-clicavel:active { transform: scale(0.98); background-color: #f8f9fa; }
-        @keyframes pulsoAviso {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.15); }
-            100% { transform: scale(1); }
-        }
-        .icone-animado {
-            display: inline-block; /* Necessário para o transform funcionar no ícone */
-            animation: pulsoAviso 1.5s infinite ease-in-out;
-        }
-    </style>
 </head>
 <body>
 
@@ -51,9 +36,9 @@
 
     <div class="modal fade" id="modalCliente" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
+            <div class="modal-content border-0 shadow">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitulo">Novo Cliente</h5>
+                    <h5 class="modal-title fw-bold" id="modalTitulo">Novo Cliente</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -67,13 +52,14 @@
                         <input type="email" id="email" class="form-control form-control-lg" placeholder="joao@email.com">
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-target="#modalCliente" data-bs-dismiss="modal">Cancelar</button>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-primary px-4" onclick="salvarCliente()">Salvar</button>
                 </div>
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="modalDetalhes" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content border-0 shadow">
@@ -85,7 +71,7 @@
                         <i class="bi bi-person-circle display-1 text-secondary opacity-50"></i>
                     </div>
                     <h4 id="detalheNome" class="fw-bold mb-1 text-dark">Nome</h4>
-                    <p id="detalheEmail" class="text-muted mb-4">email@exemplo.com</p>
+                    <p id="detalheEmail" class="text-muted mb-4">email</p>
                     
                     <div class="d-grid gap-2">
                         <button id="btnEditar" class="btn btn-primary btn-lg">
@@ -101,164 +87,26 @@
     </div>
 
     <div class="modal fade" id="modalConfirmarExclusao" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-body text-center p-4">
-                <div class="mb-3">
-                    <i class="bi bi-exclamation-triangle-fill text-warning icone-animado" style="font-size: 4rem;"></i>
-                </div>
-                
-                <h5 class="fw-bold mb-2">Excluir cliente?</h5>
-                <p class="text-muted mb-4 small">Esta ação é permanente e não poderá ser desfeita.</p>
-                
-                <div class="d-flex gap-2 justify-content-center">
-                    <button type="button" class="btn btn-light w-50" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger w-50" id="btnAcaoExcluir">Excluir</button>
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="bi bi-exclamation-triangle-fill text-warning icone-animado" style="font-size: 4rem;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Excluir cliente?</h5>
+                    <p class="text-muted mb-4 small">Esta ação é permanente e não poderá ser desfeita.</p>
+                    <div class="d-flex gap-2 justify-content-center">
+                        <button type="button" class="btn btn-light w-50" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger w-50" id="btnAcaoExcluir">Excluir</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        // --- CONFIGURAÇÃO SUPABASE ---
-        const SB_URL = 'https://lttacidpajuwolumovpz.supabase.co';
-        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0dGFjaWRwYWp1d29sdW1vdnB6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDM0MzIsImV4cCI6MjA4OTA3OTQzMn0.wKQ0VLiEz8sZ-l2Z1bh8pmPB592l4pHyXaOdPXWZC74';
-        const _supabase = supabase.createClient(SB_URL, SB_KEY);
-
-        const listaDiv = document.getElementById('listaClientes');
-        const modalEl = new bootstrap.Modal(document.getElementById('modalCliente'));
-
-        // Crie a referência para o novo modal no início do seu script
-const modalDetalhesEl = new bootstrap.Modal(document.getElementById('modalDetalhes'));
-
-// Função de listar atualizada (sem a pesquisa e sem os botões no card)
-async function carregarClientes() {
-    const { data, error } = await _supabase
-        .from('clientes')
-        .select('*')
-        .order('created_at', { ascending: false });
     
-    if (error) return alert("Erro ao buscar dados!");
+    <script src="script.js"></script>
 
-    const listaDiv = document.getElementById('listaClientes');
-
-    if (data.length === 0) {
-        listaDiv.innerHTML = '<div class="empty-state"><i class="bi bi-person-exclamation display-4"></i><p>Nenhum cliente cadastrado.</p></div>';
-        return;
-    }
-
-    // Card agora tem a classe card-clicavel e o onclick no elemento inteiro
-    listaDiv.innerHTML = data.map(c => `
-        <div class="col-12">
-            <div class="card card-cliente card-clicavel p-3" onclick="abrirDetalhes(${c.id}, '${c.nome}', '${c.email}')">
-                <h6 class="mb-1 fw-bold text-dark">${c.nome}</h6>
-                <small class="text-muted"><i class="bi bi-envelope me-1"></i>${c.email}</small>
-            </div>
-        </div>
-    `).join('');
-}
-
-// Nova função que preenche e abre o modal de detalhes
-function abrirDetalhes(id, nome, email) {
-    // Preenche os textos
-    document.getElementById('detalheNome').innerText = nome;
-    document.getElementById('detalheEmail').innerText = email;
-    
-    // Configura a ação do botão Editar
-    document.getElementById('btnEditar').onclick = () => {
-        modalDetalhesEl.hide(); // Fecha a janela de detalhes
-        prepararEdicao(id, nome, email); // Abre o formulário
-    };
-    
-    // Configura a ação do botão Deletar
-    document.getElementById('btnDeletar').onclick = () => {
-        modalDetalhesEl.hide(); // Fecha a janela de detalhes
-        deletarCliente(id); // Chama a exclusão
-    };
-
-    // Exibe o modal
-    modalDetalhesEl.show();
-}
-
-        // Criar ou Atualizar (CREATE / UPDATE)
-        async function salvarCliente() {
-            const id = document.getElementById('clienteId').value;
-            const nome = document.getElementById('nome').value;
-            const email = document.getElementById('email').value;
-
-            if (!nome || !email) return alert("Preencha todos os campos!");
-
-            let response;
-            if (id) {
-                response = await _supabase.from('clientes').update({ nome, email }).eq('id', id);
-            } else {
-                response = await _supabase.from('clientes').insert([{ nome, email }]);
-            }
-
-            if (response.error) alert("Erro ao salvar!");
-            else {
-                modalEl.hide();
-                carregarClientes();
-            }
-        }
-
-        // Deletar (DELETE)
-       // 1. Crie a referência para o novo modal no início do script (junto com os outros)
-const modalExclusaoEl = new bootstrap.Modal(document.getElementById('modalConfirmarExclusao'));
-let clienteIdParaExcluir = null; // Variável global para guardar o ID
-
-// 2. Substitua a função deletarCliente
-function deletarCliente(id) {
-    clienteIdParaExcluir = id; // Salva o ID do cliente clicado
-    modalExclusaoEl.show();    // Abre a janela com a animação
-}
-
-// 3. Adicione a ação de confirmar a exclusão
-document.getElementById('btnAcaoExcluir').onclick = async () => {
-    if (!clienteIdParaExcluir) return;
-
-    // Feedback visual: troca o texto por um "loading" (Opcional, mas melhora a UX)
-    const btn = document.getElementById('btnAcaoExcluir');
-    const textoOriginal = btn.innerHTML;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
-    btn.disabled = true;
-
-    // Comunicação com o Supabase
-    const { error } = await _supabase.from('clientes').delete().eq('id', clienteIdParaExcluir);
-
-    // Restaura o botão
-    btn.innerHTML = textoOriginal;
-    btn.disabled = false;
-
-    if (error) {
-        alert("Erro ao deletar!");
-    } else {
-        modalExclusaoEl.hide(); // Fecha o modal de confirmação
-        carregarClientes();     // Recarrega a lista sem o cliente excluído
-    }
-};
-
-        // Funções de Apoio
-        function limparForm() {
-            document.getElementById('clienteId').value = '';
-            document.getElementById('nome').value = '';
-            document.getElementById('email').value = '';
-            document.getElementById('modalTitulo').innerText = 'Novo Cliente';
-        }
-
-        function prepararEdicao(id, nome, email) {
-            document.getElementById('clienteId').value = id;
-            document.getElementById('nome').value = nome;
-            document.getElementById('email').value = email;
-            document.getElementById('modalTitulo').innerText = 'Editar Cliente';
-            modalEl.show();
-        }
-
-        // Início
-        carregarClientes();
-    </script>
 </body>
 </html>
