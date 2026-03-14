@@ -65,7 +65,8 @@ async function salvarCliente() {
     const nome = document.getElementById('nome').value;
     const email = document.getElementById('email').value;
 
-    if (!nome || !email) return alert("Preencha todos os campos!");
+   // COMO ERA: if (!nome || !email) return alert("Preencha todos os campos!");
+    if (!nome || !email) return mostrarToast("Preencha todos os campos!", "warning");
 
     let response;
     if (id) {
@@ -76,10 +77,13 @@ async function salvarCliente() {
 
     if (response.error) {
         console.error(response.error);
-        alert("Erro ao salvar!");
+        // COMO ERA: alert("Erro ao salvar!");
+        mostrarToast("Erro ao conectar com o banco de dados!", "danger");
     } else {
         modalFormEl.hide();
         carregarClientes();
+        // ADICIONE ESTA LINHA:
+        mostrarToast("Cliente salvo com sucesso!", "success");
     }
 }
 
@@ -120,10 +124,13 @@ document.getElementById('btnAcaoExcluir').onclick = async () => {
 
     if (error) {
         console.error(error);
-        alert("Erro ao deletar!");
+        // COMO ERA: alert("Erro ao deletar!");
+        mostrarToast("Erro ao excluir o cliente!", "danger");
     } else {
         modalExclusaoEl.hide();
         carregarClientes();
+        // ADICIONE ESTA LINHA:
+        mostrarToast("Cliente excluído permanentemente.", "success");
     }
 };
 // --- SISTEMA DE NAVEGAÇÃO SPA ---
