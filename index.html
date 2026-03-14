@@ -21,13 +21,75 @@
         </div>
     </nav>
 
+    <nav class="navbar navbar-dark bg-primary sticky-top mb-3 shadow-sm">
+        <div class="container-fluid justify-content-center">
+            <span class="navbar-brand mb-0 h1" id="headerTitulo">Meus Clientes</span>
+        </div>
+    </nav>
+
     <div class="container pb-5">
-        <div id="listaClientes" class="row g-3">
-            <div class="empty-state">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p class="mt-2">Carregando clientes...</p>
+        
+        <div id="view-dashboard" class="view-section d-none">
+            <h5 class="fw-bold mb-3 text-secondary">Visão Geral</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-6">
+                    <div class="card bg-primary text-white border-0 shadow-sm p-3 rounded-4 h-100">
+                        <i class="bi bi-people fs-1 opacity-50"></i>
+                        <h2 id="dashTotalClientes" class="fw-bold mb-0 mt-2">0</h2>
+                        <small>Total de Clientes</small>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card bg-success text-white border-0 shadow-sm p-3 rounded-4 h-100">
+                        <i class="bi bi-graph-up-arrow fs-1 opacity-50"></i>
+                        <h2 class="fw-bold mb-0 mt-2">+5</h2>
+                        <small>Novos este mês</small>
+                    </div>
+                </div>
+            </div>
+            
+            <h5 class="fw-bold mb-3 text-secondary">Acesso Rápido</h5>
+            <div class="row g-3">
+                <div class="col-12">
+                    <button class="btn btn-light w-100 py-3 text-start fw-bold shadow-sm border-0 rounded-4" onclick="navegarPara('clientes'); document.querySelector('.btn-float').click();">
+                        <i class="bi bi-plus-circle-fill text-primary fs-4 me-3 align-middle"></i> Cadastrar Novo Cliente
+                    </button>
+                </div>
             </div>
         </div>
+
+        <div id="view-clientes" class="view-section">
+            <div id="listaClientes" class="row g-3">
+                </div>
+        </div>
+
+        <div id="view-ajustes" class="view-section d-none">
+            <div class="card border-0 shadow-sm rounded-4 mb-4 p-4 text-center">
+                <i class="bi bi-person-circle display-1 text-secondary mb-2"></i>
+                <h4 class="fw-bold mb-0">Administrador</h4>
+                <p class="text-muted small mb-0">admin@hmcsistemas.com.br</p>
+            </div>
+
+            <div class="list-group shadow-sm rounded-4 border-0 mb-4">
+                <button class="list-group-item list-group-item-action py-3 d-flex align-items-center border-bottom-0">
+                    <i class="bi bi-moon-stars-fill fs-4 me-3 text-primary"></i>
+                    <span class="fw-bold flex-grow-1">Modo Escuro</span>
+                    <div class="form-check form-switch mb-0">
+                        <input class="form-check-input fs-5" type="checkbox" role="switch" id="themeSwitch">
+                    </div>
+                </button>
+                <button class="list-group-item list-group-item-action py-3 d-flex align-items-center border-bottom-0">
+                    <i class="bi bi-shield-lock-fill fs-4 me-3 text-success"></i>
+                    <span class="fw-bold">Privacidade e Senha</span>
+                    <i class="bi bi-chevron-right ms-auto text-muted"></i>
+                </button>
+                <button class="list-group-item list-group-item-action py-3 d-flex align-items-center text-danger border-bottom-0">
+                    <i class="bi bi-box-arrow-right fs-4 me-3"></i>
+                    <span class="fw-bold">Sair do Sistema</span>
+                </button>
+            </div>
+        </div>
+
     </div>
 
     <button class="btn btn-primary btn-float" data-bs-toggle="modal" data-bs-target="#modalCliente" onclick="limparForm()">
@@ -107,17 +169,17 @@
     <nav class="navbar fixed-bottom bg-white border-top shadow-sm pb-2 pt-2">
         <div class="container-fluid d-flex flex-row justify-content-around align-items-center px-0">
             
-            <a href="#" class="text-decoration-none text-center text-muted flex-fill">
+            <a href="#" id="nav-dashboard" class="nav-btn text-decoration-none text-center text-muted flex-fill" onclick="navegarPara('dashboard')">
                 <i class="bi bi-grid fs-4 d-block mb-1"></i>
                 <span class="d-block" style="font-size: 0.75rem;">Dashboard</span>
             </a>
             
-            <a href="#" class="text-decoration-none text-center text-primary flex-fill">
+            <a href="#" id="nav-clientes" class="nav-btn text-decoration-none text-center text-primary flex-fill" onclick="navegarPara('clientes')">
                 <i class="bi bi-people-fill fs-4 d-block mb-1"></i>
                 <span class="d-block fw-bold" style="font-size: 0.75rem;">Clientes</span>
             </a>
             
-            <a href="#" class="text-decoration-none text-center text-muted flex-fill">
+            <a href="#" id="nav-ajustes" class="nav-btn text-decoration-none text-center text-muted flex-fill" onclick="navegarPara('ajustes')">
                 <i class="bi bi-gear fs-4 d-block mb-1"></i>
                 <span class="d-block" style="font-size: 0.75rem;">Ajustes</span>
             </a>
