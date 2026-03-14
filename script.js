@@ -59,48 +59,112 @@ function abrirDetalhes(id, nome, email) {
     modalDetalhesEl.show();
 }
 
-// --- CREATE / UPDATE: Salvar Cliente ---
-async function salvarCliente() {
-    const id = document.getElementById('clienteId').value;
-    const nome = document.getElementById('nome').value;
-    const email = document.getElementById('email').value;
+// --- INTEGRAÇÃO VIACEP (PREENCHIMENTO AUTOMÁTICO) ---
+async function buscarCEP() {
+    // Pega o valor e tira tudo que não for número (ex: tira o traço)
+    let cep = document.getElementById('cep').value.replace(/\D/g, '');
+    
+    // Se não tiver 8 números, ele ignora
+    if (cep.length !== 8) return;
 
-   // COMO ERA: if (!nome || !email) return alert("Preencha todos os campos!");
-    if (!nome || !email) return mostrarToast("Preencha todos os campos!", "warning");
+    // Feedback visual enquanto carrega
+    document.getElementById('rua').value = 'Buscando...';
+    document.getElementById('bairro').value = 'Buscando...';
+    document.getElementById('cidade').value = 'Buscando...';
+    document.getElementById('uf').value = '...';
 
-    let response;
-    if (id) {
-        response = await _supabase.from('clientes').update({ nome, email }).eq('id', id);
-    } else {
-        response = await _supabase.from('clientes').insert([{ nome, email }]);
-    }
+    try {
+        let response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        let data = await response.json();
 
-    if (response.error) {
-        console.error(response.error);
-        // COMO ERA: alert("Erro ao salvar!");
-        mostrarToast("Erro ao conectar com o banco de dados!", "danger");
-    } else {
-        modalFormEl.hide();
-        carregarClientes();
-        // ADICIONE ESTA LINHA:
-        mostrarToast("Cliente salvo com sucesso!", "success");
+        if (data.erro) {
+            mostrarToast("CEP não encontrado!", "warning");
+            document.getElementById('rua').value = '';
+            document.getElementById('bairro').value = '';
+            document.getElementById('cidade').value = '';
+            document.getElementById('uf').value = '';
+            return;
+        }
+
+        // Preenche os campos magicamente
+        document.getElementById('rua').value = data.logradouro;
+        document.getElementById('bairro').value = data.bairro;
+        document.getElementById('cidade').value = data.localidade;
+        document.getElementById('uf').value = data.uf;
+
+        mostrarToast("Endereço encontrado!", "success");
+        // Joga o foco pro usuário digitar apenas o número
+        document.getElementById('numero').focus();
+
+    } catch (error) {
+        mostrarToast("Erro ao conectar no ViaCEP", "danger");
     }
 }
 
 // --- INTERFACE: Preparar Form ---
 function limparForm() {
-    document.getElementById('clienteId').value = '';
-    document.getElementById('nome').value = '';
-    document.getElementById('email').value = '';
+    const campos = ['clienteId', 'nome', 'email', 'whatsapp', 'telefone', 'cep', 'rua', 'numero', 'complemento', 'bairro', 'cidade', 'uf', 'observacoes'];
+    campos.forEach(campo => document.getElementById(campo).value = '');
     document.getElementById('modalTitulo').innerText = 'Novo Cliente';
 }
 
-function prepararEdicao(id, nome, email) {
-    document.getElementById('clienteId').value = id;
-    document.getElementById('nome').value = nome;
-    document.getElementById('email').value = email;
+function prepararEdicao(cliente) {
+    document.getElementById('clienteId').value = cliente.id || '';
+    document.getElementById('nome').value = cliente.nome || '';
+    document.getElementById('email').value = cliente.email || '';
+    document.getElementById('whatsapp').value = cliente.whatsapp || '';
+    document.getElementById('telefone').value = cliente.telefone || '';
+    document.getElementById('cep').value = cliente.cep || '';
+    document.getElementById('rua').value = cliente.rua || '';
+    document.getElementById('numero').value = cliente.numero || '';
+    document.getElementById('complemento').value = cliente.complemento || '';
+    document.getElementById('bairro').value = cliente.bairro || '';
+    document.getElementById('cidade').value = cliente.cidade || '';
+    document.getElementById('uf').value = cliente.uf || '';
+    document.getElementById('observacoes').value = cliente.observacoes || '';
+    
     document.getElementById('modalTitulo').innerText = 'Editar Cliente';
     modalFormEl.show();
+}
+
+// --- CREATE / UPDATE: Salvar Cliente ---
+async function salvarCliente() {
+    const id = document.getElementById('clienteId').value;
+    
+    // Captura todos os dados da tela
+    const dadosForm = {
+        nome: document.getElementById('nome').value,
+        email: document.getElementById('email').value,
+        whatsapp: document.getElementById('whatsapp').value,
+        telefone: document.getElementById('telefone').value,
+        cep: document.getElementById('cep').value,
+        rua: document.getElementById('rua').value,
+        numero: document.getElementById('numero').value,
+        complemento: document.getElementById('complemento').value,
+        bairro: document.getElementById('bairro').value,
+        cidade: document.getElementById('cidade').value,
+        uf: document.getElementById('uf').value,
+        observacoes: document.getElementById('observacoes').value
+    };
+
+    if (!dadosForm.nome) return mostrarToast("O Nome é obrigatório!", "warning");
+
+    let response;
+    // O botão de salvar decide se envia um UPDATE ou um INSERT
+    if (id) {
+        response = await _supabase.from('clientes').update(dadosForm).eq('id', id);
+    } else {
+        response = await _supabase.from('clientes').insert([dadosForm]);
+    }
+
+    if (response.error) {
+        console.error(response.error);
+        mostrarToast("Erro ao conectar com o banco de dados!", "danger");
+    } else {
+        modalFormEl.hide();
+        carregarClientes();
+        mostrarToast("Cliente salvo com sucesso!", "success");
+    }
 }
 
 // --- DELETE: Preparar e Confirmar Exclusão ---
