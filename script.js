@@ -1,6 +1,6 @@
 // --- CONFIGURAÇÃO SUPABASE ---
-const SB_URL = 'SUA_URL_AQUI'; 
-const SB_KEY = 'SUA_KEY_ANON_AQUI'; 
+const SB_URL = 'https://lttacidpajuwolumovpz.supabase.co'; 
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0dGFjaWRwYWp1d29sdW1vdnB6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDM0MzIsImV4cCI6MjA4OTA3OTQzMn0.wKQ0VLiEz8sZ-l2Z1bh8pmPB592l4pHyXaOdPXWZC74'; 
 const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
 // --- VARIÁVEIS GLOBAIS E MODAIS ---
