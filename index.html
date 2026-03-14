@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD Clientes - Supabase</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+        .card-cliente { border: none; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: 0.2s; }
+        .btn-float { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; }
+        .empty-state { text-align: center; margin-top: 50px; color: #6c757d; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-dark bg-primary sticky-top mb-3">
+        <div class="container-fluid justify-content-center">
+            <span class="navbar-brand mb-0 h1">Meus Clientes</span>
+        </div>
+    </nav>
+
+    <div class="container pb-5">
+        <div id="listaClientes" class="row g-3">
+            <div class="empty-state">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2">Carregando clientes...</p>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-primary btn-float" data-bs-toggle="modal" data-bs-target="#modalCliente" onclick="limparForm()">
+        <i class="bi bi-plus-lg"></i>
+    </button>
+
+    <div class="modal fade" id="modalCliente" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitulo">Novo Cliente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="clienteId">
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">NOME</label>
+                        <input type="text" id="nome" class="form-control form-control-lg" placeholder="Ex: João Silva">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">E-MAIL</label>
+                        <input type="email" id="email" class="form-control form-control-lg" placeholder="joao@email.com">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-target="#modalCliente" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary px-4" onclick="salvarCliente()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // --- CONFIGURAÇÃO SUPABASE ---
+        const SB_URL = 'SUA_URL_AQUI';
+        const SB_KEY = 'SUA_KEY_ANON_AQUI';
+        const _supabase = supabase.createClient(SB_URL, SB_KEY);
+
+        const listaDiv = document.getElementById('listaClientes');
+        const modalEl = new bootstrap.Modal(document.getElementById('modalCliente'));
+
+        // Listar Clientes (READ)
+        async function carregarClientes() {
+            const { data, error } = await _supabase.from('clientes').select('*').order('created_at', { ascending: false });
+            
+            if (error) return alert("Erro ao buscar dados!");
+
+            if (data.length === 0) {
+                listaDiv.innerHTML = '<div class="empty-state"><i class="bi bi-person-exclamation display-4"></i><p>Nenhum cliente cadastrado.</p></div>';
+                return;
+            }
+
+            listaDiv.innerHTML = data.map(c => `
+                <div class="col-12">
+                    <div class="card card-cliente p-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0 fw-bold">${c.nome}</h6>
+                                <small class="text-muted">${c.email}</small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-outline-secondary border-0" onclick="prepararEdicao(${c.id}, '${c.nome}', '${c.email}')">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger border-0" onclick="deletarCliente(${c.id})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Criar ou Atualizar (CREATE / UPDATE)
+        async function salvarCliente() {
+            const id = document.getElementById('clienteId').value;
+            const nome = document.getElementById('nome').value;
+            const email = document.getElementById('email').value;
+
+            if (!nome || !email) return alert("Preencha todos os campos!");
+
+            let response;
+            if (id) {
+                response = await _supabase.from('clientes').update({ nome, email }).eq('id', id);
+            } else {
+                response = await _supabase.from('clientes').insert([{ nome, email }]);
+            }
+
+            if (response.error) alert("Erro ao salvar!");
+            else {
+                modalEl.hide();
+                carregarClientes();
+            }
+        }
+
+        // Deletar (DELETE)
+        async function deletarCliente(id) {
+            if (confirm("Deseja realmente excluir este cliente?")) {
+                const { error } = await _supabase.from('clientes').delete().eq('id', id);
+                if (error) alert("Erro ao deletar!");
+                else carregarClientes();
+            }
+        }
+
+        // Funções de Apoio
+        function limparForm() {
+            document.getElementById('clienteId').value = '';
+            document.getElementById('nome').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('modalTitulo').innerText = 'Novo Cliente';
+        }
+
+        function prepararEdicao(id, nome, email) {
+            document.getElementById('clienteId').value = id;
+            document.getElementById('nome').value = nome;
+            document.getElementById('email').value = email;
+            document.getElementById('modalTitulo').innerText = 'Editar Cliente';
+            modalEl.show();
+        }
+
+        // Início
+        carregarClientes();
+    </script>
+</body>
+</html>
