@@ -179,3 +179,27 @@ function atualizarDashboard() {
 }
 // --- INICIALIZAÇÃO ---
 carregarClientes();
+
+// --- MODO ESCURO (DARK MODE) ---
+const themeSwitch = document.getElementById('themeSwitch');
+const htmlElement = document.documentElement; // Pega a tag <html>
+
+// 1. Verifica se o usuário já tinha escolhido o tema escuro antes
+const temaSalvo = localStorage.getItem('tema_crud_clientes');
+if (temaSalvo === 'dark') {
+    htmlElement.setAttribute('data-bs-theme', 'dark');
+    themeSwitch.checked = true; // Deixa a chavinha ligada
+}
+
+// 2. Escuta o clique no interruptor da tela de Ajustes
+themeSwitch.addEventListener('change', function() {
+    if (this.checked) {
+        // Ativa modo escuro e salva no celular/PC
+        htmlElement.setAttribute('data-bs-theme', 'dark');
+        localStorage.setItem('tema_crud_clientes', 'dark');
+    } else {
+        // Volta pro modo claro e salva
+        htmlElement.setAttribute('data-bs-theme', 'light');
+        localStorage.setItem('tema_crud_clientes', 'light');
+    }
+});
