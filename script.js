@@ -34,7 +34,7 @@ async function carregarClientes() {
     listaDiv.innerHTML = data.map(c => `
         <div class="col-12">
             <div class="card card-cliente card-clicavel p-3" onclick="abrirDetalhes(${c.id}, '${c.nome}', '${c.email}')">
-                <h6 class="mb-1 fw-bold text-dark">${c.nome}</h6>
+                <h6 class="mb-1 fw-bold ">${c.nome}</h6>
                 <small class="text-muted"><i class="bi bi-envelope me-1"></i>${c.email}</small>
             </div>
         </div>
