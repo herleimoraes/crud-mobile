@@ -126,6 +126,56 @@ document.getElementById('btnAcaoExcluir').onclick = async () => {
         carregarClientes();
     }
 };
+// --- SISTEMA DE NAVEGAÇÃO SPA ---
+function navegarPara(telaDestino) {
+    // 1. Esconde todas as telas (adicionando a classe d-none do Bootstrap)
+    document.querySelectorAll('.view-section').forEach(tela => {
+        tela.classList.add('d-none');
+    });
 
+    // 2. Mostra a tela solicitada
+    document.getElementById(`view-${telaDestino}`).classList.remove('d-none');
+
+    // 3. Reseta as cores de todos os botões do menu inferior
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('text-primary');
+        btn.classList.add('text-muted');
+        btn.querySelector('span').classList.remove('fw-bold');
+    });
+
+    // 4. Pinta o botão clicado de azul (ativo)
+    const btnAtivo = document.getElementById(`nav-${telaDestino}`);
+    btnAtivo.classList.remove('text-muted');
+    btnAtivo.classList.add('text-primary');
+    btnAtivo.querySelector('span').classList.add('fw-bold');
+
+    // 5. Muda o Título da barra superior
+    const titulos = {
+        'dashboard': 'Painel de Controle',
+        'clientes': 'Meus Clientes',
+        'ajustes': 'Configurações'
+    };
+    document.getElementById('headerTitulo').innerText = titulos[telaDestino];
+
+    // 6. Esconde o Botão Flutuante (+) se não estiver na tela de clientes
+    const btnFloat = document.querySelector('.btn-float');
+    if (telaDestino === 'clientes') {
+        btnFloat.style.display = 'flex';
+    } else {
+        btnFloat.style.display = 'none';
+    }
+
+    // 7. Ações Específicas: Se abriu o Dashboard, atualiza os números
+    if (telaDestino === 'dashboard') {
+        atualizarDashboard();
+    }
+}
+
+// --- FUNÇÃO PARA ATUALIZAR DADOS DO DASHBOARD ---
+function atualizarDashboard() {
+    // Pega o número de itens na lista atual e joga no card azul
+    const total = document.querySelectorAll('.card-cliente').length;
+    document.getElementById('dashTotalClientes').innerText = total;
+}
 // --- INICIALIZAÇÃO ---
 carregarClientes();
