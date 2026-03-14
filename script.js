@@ -203,3 +203,22 @@ themeSwitch.addEventListener('change', function() {
         localStorage.setItem('tema_crud_clientes', 'light');
     }
 });
+
+// --- SISTEMA DE NOTIFICAÇÕES (TOAST) ---
+function mostrarToast(mensagem, tipo = 'success') {
+    const toastEl = document.getElementById('appToast');
+    const toastMensagem = document.getElementById('toastMensagem');
+    
+    // Inicializa o Toast do Bootstrap com tempo de 3 segundos (3000ms)
+    const toastInstancia = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 3000 });
+
+    // Preenche o texto
+    toastMensagem.innerText = mensagem;
+
+    // Limpa cores anteriores e aplica a nova baseada no 'tipo'
+    toastEl.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-warning');
+    toastEl.classList.add(`text-bg-${tipo}`);
+
+    // Mostra na tela
+    toastInstancia.show();
+}
