@@ -43,18 +43,31 @@ listaDiv.innerHTML = data.map(c => `
 }
 
 // --- INTERFACE: Abrir Detalhes ---
-function abrirDetalhes(id, nome, email) {
-    document.getElementById('detalheNome').innerText = nome;
-    document.getElementById('detalheEmail').innerText = email;
+// --- INTERFACE: Abrir Detalhes ---
+function abrirDetalhes(cliente) {
+    document.getElementById('detalheNome').innerText = cliente.nome;
+    document.getElementById('detalheEmail').innerText = cliente.email || 'Sem e-mail';
+    document.getElementById('detalheWhatsapp').innerText = cliente.whatsapp || 'Não informado';
+    document.getElementById('detalheTelefone').innerText = cliente.telefone || 'Não informado';
     
+    // Monta o endereço de forma bonita
+    let endereco = `${cliente.rua || ''}, ${cliente.numero || 'S/N'}`;
+    if (cliente.complemento) endereco += ` - ${cliente.complemento}`;
+    if (cliente.bairro) endereco += ` (${cliente.bairro})`;
+    document.getElementById('detalheEndereco').innerText = endereco.trim().length > 5 ? endereco : 'Endereço não cadastrado';
+    document.getElementById('detalheCidadeUf').innerText = cliente.cidade ? `${cliente.cidade} - ${cliente.uf} / CEP: ${cliente.cep}` : '';
+    
+    document.getElementById('detalheObs').innerText = cliente.observacoes || 'Nenhuma observação cadastrada.';
+    
+    // Prepara os botões de ação
     document.getElementById('btnEditar').onclick = () => {
         modalDetalhesEl.hide();
-        prepararEdicao(id, nome, email);
+        prepararEdicao(cliente);
     };
     
     document.getElementById('btnDeletar').onclick = () => {
         modalDetalhesEl.hide();
-        deletarCliente(id);
+        deletarCliente(cliente.id);
     };
 
     modalDetalhesEl.show();
