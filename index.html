@@ -17,6 +17,15 @@
         .empty-state { text-align: center; margin-top: 50px; color: #6c757d; }
         .card-clicavel { cursor: pointer; }
         .card-clicavel:active { transform: scale(0.98); background-color: #f8f9fa; }
+        @keyframes pulsoAviso {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+        .icone-animado {
+            display: inline-block; /* Necessário para o transform funcionar no ícone */
+            animation: pulsoAviso 1.5s infinite ease-in-out;
+        }
     </style>
 </head>
 <body>
@@ -66,25 +75,45 @@
         </div>
     </div>
     <div class="modal fade" id="modalDetalhes" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center pt-0 pb-4">
+                    <div class="mb-3 mt-2">
+                        <i class="bi bi-person-circle display-1 text-secondary opacity-50"></i>
+                    </div>
+                    <h4 id="detalheNome" class="fw-bold mb-1 text-dark">Nome</h4>
+                    <p id="detalheEmail" class="text-muted mb-4">email@exemplo.com</p>
+                    
+                    <div class="d-grid gap-2">
+                        <button id="btnEditar" class="btn btn-primary btn-lg">
+                            <i class="bi bi-pencil-square me-2"></i>Editar
+                        </button>
+                        <button id="btnDeletar" class="btn btn-light text-danger btn-lg">
+                            <i class="bi bi-trash3 me-2"></i>Excluir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalConfirmarExclusao" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content border-0 shadow">
-            <div class="modal-header border-0 pb-0">
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body text-center pt-0 pb-4">
-                <div class="mb-3 mt-2">
-                    <i class="bi bi-person-circle display-1 text-secondary opacity-50"></i>
+            <div class="modal-body text-center p-4">
+                <div class="mb-3">
+                    <i class="bi bi-exclamation-triangle-fill text-warning icone-animado" style="font-size: 4rem;"></i>
                 </div>
-                <h4 id="detalheNome" class="fw-bold mb-1 text-dark">Nome</h4>
-                <p id="detalheEmail" class="text-muted mb-4">email@exemplo.com</p>
                 
-                <div class="d-grid gap-2">
-                    <button id="btnEditar" class="btn btn-primary btn-lg">
-                        <i class="bi bi-pencil-square me-2"></i>Editar
-                    </button>
-                    <button id="btnDeletar" class="btn btn-light text-danger btn-lg">
-                        <i class="bi bi-trash3 me-2"></i>Excluir
-                    </button>
+                <h5 class="fw-bold mb-2">Excluir cliente?</h5>
+                <p class="text-muted mb-4 small">Esta ação é permanente e não poderá ser desfeita.</p>
+                
+                <div class="d-flex gap-2 justify-content-center">
+                    <button type="button" class="btn btn-light w-50" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger w-50" id="btnAcaoExcluir">Excluir</button>
                 </div>
             </div>
         </div>
@@ -177,13 +206,40 @@ function abrirDetalhes(id, nome, email) {
         }
 
         // Deletar (DELETE)
-        async function deletarCliente(id) {
-            if (confirm("Deseja realmente excluir este cliente?")) {
-                const { error } = await _supabase.from('clientes').delete().eq('id', id);
-                if (error) alert("Erro ao deletar!");
-                else carregarClientes();
-            }
-        }
+       // 1. Crie a referência para o novo modal no início do script (junto com os outros)
+const modalExclusaoEl = new bootstrap.Modal(document.getElementById('modalConfirmarExclusao'));
+let clienteIdParaExcluir = null; // Variável global para guardar o ID
+
+// 2. Substitua a função deletarCliente
+function deletarCliente(id) {
+    clienteIdParaExcluir = id; // Salva o ID do cliente clicado
+    modalExclusaoEl.show();    // Abre a janela com a animação
+}
+
+// 3. Adicione a ação de confirmar a exclusão
+document.getElementById('btnAcaoExcluir').onclick = async () => {
+    if (!clienteIdParaExcluir) return;
+
+    // Feedback visual: troca o texto por um "loading" (Opcional, mas melhora a UX)
+    const btn = document.getElementById('btnAcaoExcluir');
+    const textoOriginal = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+    btn.disabled = true;
+
+    // Comunicação com o Supabase
+    const { error } = await _supabase.from('clientes').delete().eq('id', clienteIdParaExcluir);
+
+    // Restaura o botão
+    btn.innerHTML = textoOriginal;
+    btn.disabled = false;
+
+    if (error) {
+        alert("Erro ao deletar!");
+    } else {
+        modalExclusaoEl.hide(); // Fecha o modal de confirmação
+        carregarClientes();     // Recarrega a lista sem o cliente excluído
+    }
+};
 
         // Funções de Apoio
         function limparForm() {
