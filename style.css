@@ -59,3 +59,14 @@ body {
     transform: scale(0.95);
     transition: 0.1s;
 }
+/* Adaptações Automáticas para o Modo Escuro do Bootstrap */
+[data-bs-theme="dark"] body {
+    background-color: #121212;
+}
+[data-bs-theme="dark"] .card-cliente {
+    background-color: #1e1e1e;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+[data-bs-theme="dark"] .card-clicavel:active {
+    background-color: #2a2a2a;
+}
